@@ -1,0 +1,14 @@
+{
+  "mode": "stock",
+  "quoter": "as",
+  "s0": 100,
+  "mu": 0,
+  "sigma": 2,
+  "dt": 0.005,
+  "n_steps": 200,
+  "seed": 1,
+  "arrival_A": 140,
+  "arrival_k": 1.5,
+  "gamma": 0.1,
+  "kappa": 1.5
+}

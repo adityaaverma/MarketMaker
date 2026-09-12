@@ -1,0 +1,7 @@
+mode=stock quoter=as steps=200 final_inventory=2 final_cash=143.023 final_mark_to_market_pnl=145.917
+Saved /sessions/rcw-015wgusvaus7tdhkufkwfqf3/mnt/Market-Maker/experiments/2026-09-12_stock_as_baseline/chart.png
+rows=200
+avg_spread=1.4918  min_spread=1.2928  max_spread=1.6904
+inventory: min=-2 max=3 final=2
+final_mark_to_market=145.7770
+mark_to_market: min=-16.8873 max=148.6920 std=52.1940

@@ -1,0 +1,19 @@
+{
+  "mode": "option",
+  "quoter": "as",
+  "s0": 100,
+  "strike": 100,
+  "rate": 0.02,
+  "option_type": "call",
+  "time_to_expiry": 0.25,
+  "mu": 0,
+  "sigma": 0.2,
+  "option_vol": 0.2,
+  "dt": 0.005,
+  "n_steps": 200,
+  "seed": 1,
+  "arrival_A": 140,
+  "arrival_k": 1.5,
+  "gamma": 0.005,
+  "kappa": 1.5
+}

@@ -1,0 +1,13 @@
+{
+  "mode": "stock",
+  "quoter": "naive",
+  "s0": 100,
+  "mu": 0,
+  "sigma": 2,
+  "dt": 0.005,
+  "n_steps": 200,
+  "seed": 1,
+  "arrival_A": 140,
+  "arrival_k": 1.5,
+  "naive_half_spread": 0.845
+}

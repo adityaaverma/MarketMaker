@@ -1,0 +1,7 @@
+mode=option quoter=as steps=200 final_inventory=7 final_cash=64.1917 final_mark_to_market_pnl=64.1917
+Saved /sessions/rcw-015wgusvaus7tdhkufkwfqf3/mnt/Market-Maker/experiments/2026-09-12_option_as_smoketest/chart.png
+rows=200
+avg_spread=1.4857  min_spread=1.3311  max_spread=2.6697
+inventory: min=-3 max=7 final=7
+final_mark_to_market=64.1917
+mark_to_market: min=-0.1521 max=64.1917 std=20.2379
