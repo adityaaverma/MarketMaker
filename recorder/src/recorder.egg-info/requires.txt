@@ -1,0 +1,8 @@
+websockets>=12.0
+aiohttp>=3.9
+pyyaml>=6.0
+zstandard>=0.22
+
+[dev]
+pytest>=8.0
+ruff>=0.6

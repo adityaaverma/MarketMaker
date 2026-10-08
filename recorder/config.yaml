@@ -1,0 +1,22 @@
+# Phase 0 recorder config — symbols, streams, output.
+# Fill in the third symbol after picking a mid-liquidity perp (volume rank ~20-40).
+
+symbols:
+  - BTCUSDT
+  - ETHUSDT
+  # - TODO: mid-liquidity perp
+
+streams:
+  - depth@100ms
+  - aggTrade
+  - bookTicker
+
+output_dir: data/raw/binance
+
+snapshot:
+  rest_endpoint: https://fapi.binance.com/fapi/v1/depth
+  interval_seconds: 3600 # hourly + after every reconnect
+
+rotation:
+  interval_seconds: 3600 # hourly file rotation
+  compression: zstd
