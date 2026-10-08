@@ -8,3 +8,7 @@ __pycache__/
 market-maker/
 main
 *.csv
+data/
+.venv/
+*.zst
+*.parquet
