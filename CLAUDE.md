@@ -61,4 +61,4 @@ Each experiment gets `experiments/YYYY-MM-DD_short-name/` with `config.json` (wh
 (Fill in as they are created.)
 - Build engine: `TODO`
 - Run tests: `TODO`
-- Run recorder: `TODO`
+- Run recorder: `cd recorder && source recorder/bin/activate && python -m recorder.main` (stop with Ctrl+C or SIGTERM — both flush the writer cleanly)
