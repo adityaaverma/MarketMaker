@@ -4,7 +4,7 @@
 symbols:
   - BTCUSDT
   - ETHUSDT
-  # - TODO: mid-liquidity perp
+  - AVAXUSDT # mid-liquidity perp, ~rank 29 by 24h quote volume on 2026-10-11
 
 streams:
   - depth@100ms
