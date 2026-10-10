@@ -12,3 +12,4 @@ data/
 .venv/
 *.zst
 *.parquet
+*.egg-info/
