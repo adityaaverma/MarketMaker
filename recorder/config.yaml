@@ -8,14 +8,20 @@ symbols:
 
 streams:
   - depth@100ms
-  - aggTrade
   - bookTicker
+  # aggTrade intentionally excluded — websocket accepts the subscription
+  # but never delivers (docs/decisions/0001-aggtrade-stream-not-delivering.md).
+  # Fetched via REST polling instead (rest_poll.py).
 
 output_dir: data/raw/binance
 
 snapshot:
   rest_endpoint: https://fapi.binance.com/fapi/v1/depth
   interval_seconds: 3600 # hourly + after every reconnect
+
+rest_poll:
+  agg_trades_interval_seconds: 1
+  perp_metrics_interval_seconds: 300
 
 rotation:
   interval_seconds: 3600 # hourly file rotation
