@@ -22,10 +22,27 @@ import aiohttp
 BASE = "https://fapi.binance.com"
 
 
+async def get_with_backoff(session: aiohttp.ClientSession, url: str, params: dict) -> dict | list:
+    """GET that retries forever on a 429, waiting however long Binance's own
+    Retry-After header says. Every REST poll in this recorder goes through
+    this — one endpoint getting rate-limited must never raise and tear down
+    whatever TaskGroup it's running in (confirmed on the VM: an unprotected
+    snapshot call hitting 429 killed the entire recorder, websocket included,
+    and systemd's restart re-fired every poll loop immediately, which just
+    re-triggered the same 429s — a self-sustaining crash loop)."""
+    while True:
+        async with session.get(url, params=params) as resp:
+            if resp.status == 429:
+                retry_after = float(resp.headers.get("Retry-After", 5))
+                print(f"rate-limited on {url}, backing off {retry_after}s")
+                await asyncio.sleep(retry_after)
+                continue
+            resp.raise_for_status()
+            return await resp.json()
+
+
 async def _get(session: aiohttp.ClientSession, path: str, params: dict) -> dict | list:
-    async with session.get(BASE + path, params=params) as resp:
-        resp.raise_for_status()
-        return await resp.json()
+    return await get_with_backoff(session, BASE + path, params)
 
 
 async def poll_agg_trades_once(
@@ -48,23 +65,10 @@ async def poll_agg_trades_once(
 async def _catch_up_one_symbol(
     session: aiohttp.ClientSession, symbol: str, writer, last_ids: dict[str, int | None]
 ) -> None:
-    """Poll one symbol until caught up. A 429 here backs off using Binance's
-    own Retry-After and keeps going — it must NOT propagate up, or it tears
-    down the loop for every other symbol too and main.py's _resilient
-    wrapper restarts the whole thing from scratch, losing last_ids for
-    symbols that were perfectly fine (confirmed on the VM: one symbol's 429
-    was repeatedly killing tracking for all three)."""
+    """Poll one symbol until caught up. Rate-limit backoff is handled inside
+    get_with_backoff, so this just keeps calling until there's nothing new."""
     while True:
-        try:
-            new_last = await poll_agg_trades_once(session, symbol, writer, last_ids[symbol])
-        except aiohttp.ClientResponseError as e:
-            if e.status != 429:
-                raise
-            retry_after = float(e.headers.get("Retry-After", 5)) if e.headers else 5.0
-            print(f"aggTrades rate-limited on {symbol}, backing off {retry_after}s")
-            await asyncio.sleep(retry_after)
-            continue
-
+        new_last = await poll_agg_trades_once(session, symbol, writer, last_ids[symbol])
         caught_up = new_last == last_ids[symbol]
         last_ids[symbol] = new_last
         if caught_up:

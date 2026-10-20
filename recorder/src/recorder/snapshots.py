@@ -11,13 +11,13 @@ import time
 
 import aiohttp
 
+from .rest_poll import get_with_backoff
+
 REST_ENDPOINT = "https://fapi.binance.com/fapi/v1/depth"
 
 
 async def fetch_snapshot(session: aiohttp.ClientSession, symbol: str, limit: int = 1000) -> dict:
-    async with session.get(REST_ENDPOINT, params={"symbol": symbol, "limit": limit}) as resp:
-        resp.raise_for_status()
-        return await resp.json()
+    return await get_with_backoff(session, REST_ENDPOINT, {"symbol": symbol, "limit": limit})
 
 
 async def snapshot_once(session: aiohttp.ClientSession, symbol: str, writer) -> None:
