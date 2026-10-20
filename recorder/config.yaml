@@ -20,7 +20,9 @@ snapshot:
   interval_seconds: 3600 # hourly + after every reconnect
 
 rest_poll:
-  agg_trades_interval_seconds: 1
+  # was 1s — hit Binance's per-minute request-weight limit (429s) once
+  # aggTrade + snapshot + premiumIndex + openInterest were all polling.
+  agg_trades_interval_seconds: 3
   perp_metrics_interval_seconds: 300
 
 rotation:

@@ -45,18 +45,38 @@ async def poll_agg_trades_once(
     return trades[-1]["a"]
 
 
-async def agg_trades_loop(symbols: list[str], writer, interval_seconds: float = 1.0) -> None:
+async def _catch_up_one_symbol(
+    session: aiohttp.ClientSession, symbol: str, writer, last_ids: dict[str, int | None]
+) -> None:
+    """Poll one symbol until caught up. A 429 here backs off using Binance's
+    own Retry-After and keeps going — it must NOT propagate up, or it tears
+    down the loop for every other symbol too and main.py's _resilient
+    wrapper restarts the whole thing from scratch, losing last_ids for
+    symbols that were perfectly fine (confirmed on the VM: one symbol's 429
+    was repeatedly killing tracking for all three)."""
+    while True:
+        try:
+            new_last = await poll_agg_trades_once(session, symbol, writer, last_ids[symbol])
+        except aiohttp.ClientResponseError as e:
+            if e.status != 429:
+                raise
+            retry_after = float(e.headers.get("Retry-After", 5)) if e.headers else 5.0
+            print(f"aggTrades rate-limited on {symbol}, backing off {retry_after}s")
+            await asyncio.sleep(retry_after)
+            continue
+
+        caught_up = new_last == last_ids[symbol]
+        last_ids[symbol] = new_last
+        if caught_up:
+            return
+
+
+async def agg_trades_loop(symbols: list[str], writer, interval_seconds: float = 3.0) -> None:
     last_ids: dict[str, int | None] = {s: None for s in symbols}
     async with aiohttp.ClientSession() as session:
         while True:
             for symbol in symbols:
-                # loop in case more than `limit` trades piled up since last poll
-                while True:
-                    new_last = await poll_agg_trades_once(session, symbol, writer, last_ids[symbol])
-                    caught_up = new_last == last_ids[symbol]
-                    last_ids[symbol] = new_last
-                    if caught_up:
-                        break
+                await _catch_up_one_symbol(session, symbol, writer, last_ids)
             await asyncio.sleep(interval_seconds)
 
 
